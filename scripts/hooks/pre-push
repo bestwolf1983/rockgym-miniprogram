@@ -1,0 +1,8 @@
+#!/bin/sh
+# Push 前自动跑完整发布前复核。由 scripts/install-hooks.sh 安装到 .git/hooks/。
+# 本地专属规则放在 .git/hooks/check.local.env（不进仓库），如存在则加载。
+repo=$(git rev-parse --show-toplevel) || exit 1
+[ -f "$repo/.git/hooks/check.local.env" ] && . "$repo/.git/hooks/check.local.env"
+echo "pre-push: running pre-publish-check..."
+"$repo/scripts/pre-publish-check.sh" < /dev/null || exit 1
+exit 0

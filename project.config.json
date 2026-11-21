@@ -45,7 +45,7 @@
       { "type": "file", "value": "project.private.config.json" },
       { "type": "file", "value": "design/tokens.ts" },
       { "type": "file", "value": "services/config.private.example.ts" },
-      { "type": "file", "value": "scripts/pre-publish-check.sh" }
+      { "type": "folder", "value": "scripts" }
     ],
     "include": []
   },

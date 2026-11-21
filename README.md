@@ -51,10 +51,13 @@
 ## 发布前自检
 
 ```bash
-./scripts/pre-publish-check.sh
+./scripts/install-hooks.sh      # clone 后运行一次
+./scripts/pre-publish-check.sh  # 手动跑一次完整复核
 ```
 
-检查提交邮箱、敏感文件、密钥内容、历史作者、依赖源与开源交付件。提交钩子会自动执行暂存区版本；本机装有 gitleaks 时会自动启用深度扫描。
+安装后，每次 `git commit` 检查暂存内容，每次 `git push` 自动跑一次完整复核，不通过就中止推送。检查项包括提交邮箱、敏感文件、密钥内容、历史作者、依赖源与开源交付件；本机装有 gitleaks 时会自动启用深度扫描。
+
+钩子模板在 `scripts/hooks/`，只安装到 `.git/hooks/`，不会进入公开仓库。本地专属规则可写在 `.git/hooks/check.local.env`（同样不进仓库），由钩子自动加载。
 
 ## License
 
