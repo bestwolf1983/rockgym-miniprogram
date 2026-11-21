@@ -1,0 +1,32 @@
+/* 全局样式。设计变量来自 design/tokens.wxss（由 tokens.json 生成，勿手改） */
+@import './design/tokens.wxss';
+
+page {
+  background: var(--c-bg);
+  color: var(--c-text-1);
+  font-size: var(--f-body);
+  line-height: 1.6;
+  --safe-bottom: env(safe-area-inset-bottom);
+}
+
+/* 排版铁律：正文 28rpx / 行高 1.6；页面左右安全边距 32rpx；同屏最多两级标题 */
+.page-pad { padding-left: var(--s-5); padding-right: var(--s-5); }
+
+.card {
+  background: var(--c-surface);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-card);
+  padding: var(--s-4);
+}
+
+.row { display: flex; align-items: center; justify-content: space-between; }
+.muted { color: var(--c-text-2); }
+.tiny { font-size: var(--f-cap); color: var(--c-text-3); }
+.divider { height: 1rpx; background: var(--c-line); margin: var(--s-3) 0; }
+
+/* tabBar 底部占位。tabBar 是 fixed 定位不占文档流，
+   页面滚动内容末尾必须显式留出高度，否则最后一个元素被压住。
+   不用 scroll-view 的 padding-bottom —— Skyline 下不总是作用于滚动内容。
+   高度 = tabBar 本体 112rpx + 选中项凸起气泡露出的部分（上浮 30rpx + 白边 6rpx）。 */
+.tabbar-spacer { height: calc(160rpx + var(--safe-bottom)); }
+

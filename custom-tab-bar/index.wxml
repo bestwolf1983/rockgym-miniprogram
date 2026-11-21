@@ -1,0 +1,21 @@
+<!-- 自定义 tabBar。图标用 WXSS 的 data URI SVG（小程序 WXML 不支持内联 <svg>），
+     画法与 H5 原型同一套：24x24 viewBox / stroke-width 1.9 / 圆头端点。
+     选中项的图标托座上浮成实心气泡，文字留在原位（transform 不影响布局）。
+
+     ⚠️ 根节点必须带 rg-scope：设计变量定义在 `page, .rg-scope` 上，
+     而 custom-tab-bar 不在 page 元素内，不加这个类所有 var(--*) 都会失效
+     （表现为气泡无背景、白色图标融进白底完全看不见）。 -->
+<view class="tabbar rg-scope">
+  <view
+    wx:for="{{items}}"
+    wx:key="path"
+    class="tabbar-item {{active === index ? 'is-active' : ''}}"
+    data-index="{{index}}"
+    bind:tap="onTap"
+  >
+    <view class="tabbar-dock">
+      <view class="tabbar-icon tabbar-icon-{{index}}"></view>
+    </view>
+    <text class="tabbar-text">{{item.text}}</text>
+  </view>
+</view>

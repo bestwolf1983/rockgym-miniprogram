@@ -1,0 +1,123 @@
+/* scroll-view 必须有**确定高度**才能算出滚动范围。
+   用 min-height 的话容器被内容撑开、不产生内部滚动，滑到底部后回滑会卡住
+   （滚动被外层接管）。这里固定 100vh，内容超出时在容器内滚。 */
+.page {
+  height: 100vh;
+  box-sizing: border-box;
+  padding-top: calc(24rpx + env(safe-area-inset-top));
+}
+
+/* 非 tab 页：底部只需留安全区，不要 tabBar 占位（本页不显示 tabBar） */
+.page-bottom { height: calc(48rpx + env(safe-area-inset-bottom)); }
+
+/* 返回入口：自定义导航下必须自带，否则该页无法退出 */
+.nav { margin-bottom: 8rpx; }
+.back {
+  display: inline-block; font-size: var(--f-sub); color: var(--c-primary-strong);
+  padding: 6rpx 4rpx 6rpx 0;
+}
+
+.pt { display: block; font-size: var(--f-h1); font-weight: 600; letter-spacing: -1rpx; }
+.pt-sub { display: block; font-size: var(--f-sub); color: var(--c-text-2); margin: 8rpx 0 28rpx; }
+
+.hint { font-size: var(--f-cap); color: var(--c-text-3); padding: 40rpx 0; }
+.err {
+  font-size: var(--f-cap); color: var(--c-block-ink);
+  background: var(--c-block-soft); border-radius: var(--r-lg);
+  padding: 22rpx 26rpx; margin-bottom: var(--s-3);
+}
+
+/* 演示身份切换 */
+.demo { margin-bottom: var(--s-3); }
+.demo-label { display: block; font-size: 18rpx; color: var(--c-text-3); }
+.demo-chips { display: flex; flex-wrap: wrap; gap: 12rpx; margin-top: 12rpx; }
+.demo-chip {
+  font-size: 21rpx; padding: 8rpx 20rpx; border-radius: var(--r-full, 999rpx);
+  background: var(--c-surface); color: var(--c-text-2);
+  box-shadow: var(--sh-card);
+}
+.demo-chip.is-on { background: var(--c-primary-strong, #1FA98F); color: #FFFFFF; font-weight: 600; }
+
+/* 通道自检 */
+.ping {
+  background: var(--c-surface-sunken); border-radius: var(--r-md);
+  padding: 18rpx 24rpx; margin-bottom: var(--s-3);
+}
+.ping-b { display: block; font-size: var(--f-cap); color: var(--c-text-2); font-weight: 600; }
+.ping-r { display: block; font-size: 20rpx; color: var(--c-text-3); margin-top: 6rpx; word-break: break-all; }
+
+/* 我是谁 */
+.me-card {
+  background: var(--c-surface); border-radius: var(--r-lg);
+  padding: 28rpx; box-shadow: var(--sh-card); margin-bottom: var(--s-3);
+}
+.mc-name { display: block; font-size: 32rpx; font-weight: 600; }
+.mc-roles { display: flex; flex-wrap: wrap; gap: 10rpx; margin-top: 16rpx; }
+.mc-none { font-size: var(--f-cap); color: var(--c-text-3); }
+
+.role-chip {
+  font-size: 21rpx; padding: 6rpx 18rpx; border-radius: var(--r-full, 999rpx);
+  background: var(--c-primary-soft); color: var(--c-primary-strong);
+}
+.role-chip.is-role { background: var(--c-surface-sunken); color: var(--c-text-2); }
+
+.section-title { margin: var(--s-4) 0 var(--s-2); }
+.section-h { font-size: var(--f-sub); font-weight: 600; }
+
+.abilities { display: flex; flex-wrap: wrap; gap: 10rpx; }
+.ab {
+  font-size: 20rpx; padding: 6rpx 16rpx; border-radius: var(--r-sm);
+  background: var(--c-surface-sunken); color: var(--c-text-2);
+}
+
+/* 人员列表 */
+.st {
+  background: var(--c-surface); border-radius: var(--r-lg);
+  padding: 24rpx 28rpx; box-shadow: var(--sh-card); margin-bottom: 16rpx;
+}
+.st-head { display: flex; align-items: center; justify-content: space-between; }
+.st-name { font-size: 28rpx; font-weight: 600; }
+.st-add { font-size: var(--f-cap); color: var(--c-primary-strong); }
+.st-roles { display: flex; flex-wrap: wrap; gap: 10rpx; margin-top: 16rpx; }
+
+.tip { font-size: 20rpx; color: var(--c-text-3); margin-top: var(--s-2); line-height: 1.6; }
+
+/* --- 经营报表 --- */
+.rp-months { display: flex; gap: 10rpx; }
+.rp-month {
+  font-size: 20rpx; padding: 4rpx 16rpx; border-radius: var(--r-full, 999rpx);
+  background: var(--c-surface-sunken); color: var(--c-text-3);
+}
+.rp-month.is-on { background: var(--c-primary-strong, #1FA98F); color: #fff; }
+
+.rp-card {
+  background: var(--c-surface); border-radius: var(--r-lg);
+  padding: 24rpx 28rpx; box-shadow: var(--sh-card); margin-bottom: 16rpx;
+}
+.rp-head { margin-bottom: 12rpx; }
+.rp-t { display: block; font-size: var(--f-sub); font-weight: 600; }
+.rp-sub { display: block; font-size: 20rpx; color: var(--c-text-3); margin-top: 4rpx; }
+
+.rp-row {
+  display: flex; align-items: baseline; gap: 16rpx;
+  padding: 14rpx 0; border-top: 1rpx solid var(--c-surface-sunken);
+}
+.rp-name { font-size: var(--f-sub); font-weight: 600; min-width: 96rpx; }
+.rp-meta { flex: 1; font-size: 20rpx; color: var(--c-text-3); }
+.rp-val { font-size: var(--f-sub); font-weight: 700; color: var(--c-primary-strong); }
+
+.rp-slots { display: flex; gap: 16rpx; }
+.rp-slot {
+  flex: 1; background: var(--c-surface-sunken); border-radius: var(--r-md);
+  padding: 16rpx 0; text-align: center;
+}
+.rp-slot-n { display: block; font-size: 34rpx; font-weight: 700; }
+.rp-slot-l { display: block; font-size: 20rpx; color: var(--c-text-3); margin-top: 4rpx; }
+
+/* --- 审计记录 --- */
+.au {
+  display: flex; gap: 16rpx; align-items: baseline;
+  padding: 12rpx 4rpx; border-bottom: 1rpx solid var(--c-surface-sunken);
+}
+.au-time { font-size: 20rpx; color: var(--c-text-3); flex: 0 0 auto; }
+.au-text { flex: 1; font-size: var(--f-cap); color: var(--c-text-2); }

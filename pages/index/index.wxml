@@ -1,0 +1,269 @@
+<!--
+  首页。信息优先级：
+    无预约（大多数散客）→ 课表时间轴是主体，先让人看懂"这里能学什么"
+    有预约            → 我的今日置顶
+  不做九宫格：九宫格看起来功能多，实际稀释本期核心。
+-->
+<scroll-view
+  type="list"
+  scroll-y
+  class="home"
+  refresher-enabled
+  bind:refresherrefresh="onPullDownRefresh"
+>
+  <!-- 门店切换 -->
+  <view class="home-top page-pad">
+    <view class="store-switch" bind:tap="onStoreTap">
+      <text class="store-name">{{store.name || '选择门店'}}</text>
+      <view class="caret"></view>
+    </view>
+    <view class="bell">
+      <view wx:if="{{member.unreadCount > 0}}" class="bell-dot"></view>
+    </view>
+  </view>
+
+  <view class="page-pad">
+    <text class="greeting">你好，{{member.displayName || '岩友'}}</text>
+    <!-- 游客的 admission 没有 greeting（未认证不生成），给一句引导文案 -->
+    <text class="greeting-sub">{{isVisitor ? '登录后可预约课程与签到' : admission.greeting}}</text>
+
+    <!-- 演示身份切换。四种会员状态是本产品的核心差异，
+         不给切换入口，演示时只能看到一种状态。上线前整块删除即可。 -->
+    <view wx:if="{{demoMode}}" class="demo-switch">
+      <text class="demo-label">演示身份</text>
+      <view class="demo-chips">
+        <text
+          wx:for="{{demoMembers}}"
+          wx:key="id"
+          class="demo-chip {{memberId === item.id ? 'is-on' : ''}}"
+          data-id="{{item.id}}"
+          bind:tap="onDemoMemberTap"
+        >{{item.label}}</text>
+      </view>
+    </view>
+
+    <!-- 请求过的域名清单（demo 用）。真机调试模式下跑一次，这里列出的域名
+         就是微信后台 request 合法域名需要配全的清单。上线前随 demo-switch 一起删。 -->
+    <view wx:if="{{demoMode && netHosts}}" class="net-hosts">
+      <text class="nh-k">已请求域名（配白名单用）</text>
+      <text class="nh-v">{{netHosts}}</text>
+    </view>
+
+    <!-- 加载失败提示（真机排查用）。
+         真机没有控制台，把错误和请求域名摊在页面上，截图就能定位；
+         正式版连同 index.ts 的 loadError/dbHost 一起删。 -->
+    <view wx:if="{{loadError}}" class="load-err">
+      <text class="le-t">数据加载失败</text>
+      <text class="le-m">{{loadError}}</text>
+      <text class="le-h">请求域名：{{dbHost}}</text>
+      <text class="le-h">{{envInfo}}</text>
+      <text class="le-h">{{netInfo}}</text>
+    </view>
+
+    <!-- 游客（未登录）：通行证与签到需要身份，给登录入口而不是一张空卡。
+         匿名浏览是产品需求：能看课表/教练/换线，约课与签到要登录。 -->
+    <view wx:if="{{isVisitor}}" class="scan-card">
+      <view class="scan-head">
+        <text class="scan-title">通行证与签到</text>
+        <text class="scan-sub">登录后可签到、约课、查看我的卡</text>
+      </view>
+      <button class="scan-btn" hover-class="scan-btn-hover" bind:tap="onLoginTap">微信一键登录</button>
+      <text class="scan-tip">游客可浏览课表与教练，约课需登录</text>
+    </view>
+
+    <!-- 扫码签到：扫馆内二维码完成签到 —— 是"扫店家的码"，不是出示自己的码。
+         能否扫码签到取决于认证状态（xmind：能不能扫码签到和认证标签有关），
+         未通过时不给扫码入口，而是引导去完成认证。 -->
+    <view wx:else class="scan-card">
+      <view class="scan-head">
+        <text class="scan-title">扫码签到</text>
+        <text class="scan-sub">{{admission.state === 'pass' ? '对准馆内二维码即可完成签到' : admission.title}}</text>
+      </view>
+      <button
+        wx:if="{{admission.state === 'pass'}}"
+        class="scan-btn"
+        hover-class="scan-btn-hover"
+        bind:tap="onScanTap"
+      >扫码签到</button>
+      <button
+        wx:else
+        class="scan-btn scan-btn-{{admission.action.tone}}"
+        hover-class="scan-btn-hover"
+        bind:tap="onPassActionTap"
+      >{{admission.action.text}}</button>
+      <text wx:if="{{admission.state !== 'pass'}}" class="scan-tip">完成安全认证后即可扫码签到</text>
+    </view>
+
+    <!-- ★★ 换线信息（ROUTE-01~06）：ToC 拉新到店的核心。
+         正计时表达新鲜度，倒计时制造紧迫感，直方图回答"有没有适合我的难度"。
+         平面图把区域名落到空间位置，回答"换的是哪片墙"。 -->
+    <block wx:if="{{routeBoard.areas.length}}">
+      <view class="section-title">
+        <text class="section-h">线路与换线</text>
+        <text class="section-more">分区独立换线</text>
+      </view>
+
+      <image
+        class="floorplan"
+        src="{{floorplanUrl}}"
+        mode="widthFix"
+        lazy-load
+        bind:tap="onFloorplanTap"
+      />
+      <text class="floorplan-cap">场馆分区图 · 点击放大</text>
+
+      <view class="route-list">
+        <view wx:for="{{routeBoard.areas}}" wx:key="areaCode" class="route-card">
+          <view class="rt-head">
+            <text class="rt-area">{{item.areaName}}</text>
+            <text wx:if="{{item.isFresh}}" class="rt-new">新线</text>
+          </view>
+
+          <view class="rt-times">
+            <text class="rt-fresh">{{item.freshLabel}}</text>
+            <text
+              wx:if="{{item.countdownLabel}}"
+              class="rt-cd {{item.isUrgent ? 'is-urgent' : ''}}"
+            >{{item.countdownLabel}}</text>
+          </view>
+
+          <view wx:for="{{item.histograms}}" wx:for-item="h" wx:key="system" class="hgroup">
+            <text class="hgroup-t">{{h.systemLabel}}</text>
+            <view class="hbars">
+              <view wx:for="{{h.bars}}" wx:for-item="b" wx:key="label" class="hbar">
+                <view class="hbar-track">
+                  <view class="hbar-fill" style="height:{{b.percent}}%"></view>
+                </view>
+                <text class="hbar-n">{{b.count}}</text>
+                <text class="hbar-l">{{b.label}}</text>
+              </view>
+            </view>
+          </view>
+
+          <view class="rt-foot">
+            <text class="rt-count">共 {{item.routeCount}} 条线路</text>
+          </view>
+
+          <view wx:if="{{item.setter}}" class="rt-setter">
+            <image class="rt-s-avatar" src="{{item.setter.avatarUrl}}" mode="aspectFill" />
+            <view class="rt-s-meta">
+              <text class="rt-sn">{{item.setter.name}}</text>
+              <text class="rt-st">{{item.setter.title}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <!-- ★ 我的今日：仅有预约时出现 -->
+    <block wx:if="{{myToday}}">
+      <view class="section-title">
+        <text class="section-h">我的今日</text>
+      </view>
+      <view class="my-booking" bind:tap="onMySessionTap">
+        <text class="mb-k">{{myToday.timeRange}} · {{myToday.storeName}}</text>
+        <text class="mb-t">{{myToday.title}}</text>
+        <text class="mb-s">{{myToday.highlightText}}</text>
+        <view class="mb-coach">
+          <image class="mb-avatar" src="{{myToday.coach.avatarUrl}}" mode="aspectFill" />
+          <view>
+            <text class="mb-cn">教练 {{myToday.coach.nickname}}</text>
+            <text class="mb-ct">{{myToday.coach.tagline}}</text>
+          </view>
+        </view>
+        <view class="mb-actions">
+          <text wx:if="{{myToday.canShowQr}}" class="mb-btn solid" catch:tap="onMyQrTap">出示入场码</text>
+          <text class="mb-btn">改约</text>
+          <text class="mb-btn">取消</text>
+        </view>
+      </view>
+    </block>
+
+    <!-- ★★ 今日课表：散客首屏主体 -->
+    <view class="section-title">
+      <text class="section-h">今日课表</text>
+      <text class="section-more">全部课程 →</text>
+    </view>
+
+    <scroll-view type="list" scroll-x class="day-switch" show-scrollbar="{{false}}">
+      <view class="day-switch-inner">
+        <view
+          wx:for="{{schedule.days}}"
+          wx:key="date"
+          class="day {{item.active ? 'is-on' : ''}}"
+          data-date="{{item.date}}"
+          bind:tap="onDayTap"
+        >
+          <text class="day-w">{{item.weekLabel}}</text>
+          <text class="day-d">{{item.dayLabel}}</text>
+          <text class="day-n">{{item.sessionCount}} 节</text>
+        </view>
+      </view>
+    </scroll-view>
+
+    <scroll-view type="list" scroll-x class="grade-filter" show-scrollbar="{{false}}">
+      <view class="grade-filter-inner">
+        <view
+          wx:for="{{schedule.gradeFilters}}"
+          wx:key="key"
+          class="gf {{item.active ? 'is-on' : ''}}"
+          data-key="{{item.key}}"
+          bind:tap="onGradeTap"
+        >{{item.label}}</view>
+      </view>
+    </scroll-view>
+
+    <view class="tl-wrap">
+      <course-timeline
+        entries="{{schedule.entries}}"
+        nowAfterIndex="{{schedule.nowAfterIndex}}"
+        nowLabel="{{schedule.nowLabel}}"
+        visitor="{{isVisitor}}"
+      />
+    </view>
+
+    <!-- 本店教练：复购跟人走，把人放在前面 -->
+    <view class="section-title">
+      <text class="section-h">本店教练</text>
+      <text class="section-more">全部 {{coaches.length}} 位 →</text>
+    </view>
+  </view>
+
+  <scroll-view type="list" scroll-x class="coach-strip" show-scrollbar="{{false}}">
+    <view class="coach-strip-inner">
+      <!-- 私教入口挂在教练头像上（PT-05）：攀岩馆复购跟人走，用户记的是
+           "我想找 Kiki 上课"，不是"我要约私教"。
+           角标用卡片右上角的直角等边三角形表达状态，文案/配色/可点性均来自服务端。 -->
+      <view
+        wx:for="{{coaches}}"
+        wx:key="id"
+        class="coach-cell {{item.ptBadge.show ? 'has-pt' : ''}}"
+        data-id="{{item.id}}"
+        data-clickable="{{item.ptBadge.clickable}}"
+        bind:tap="onCoachTap"
+        hover-class="{{item.ptBadge.clickable ? 'tile-hover' : ''}}"
+      >
+        <view class="cc-avatar-wrap">
+          <image class="cc-avatar" src="{{item.avatarUrl}}" mode="aspectFill" lazy-load />
+          <view wx:if="{{item.ptBadge.show}}" class="pt-corner pt-{{item.ptBadge.tone}}"></view>
+        </view>
+        <text class="cc-name">{{item.nickname}}</text>
+        <text class="cc-spec">{{item.specialtyLabel}}</text>
+        <text wx:if="{{item.ptBadge.show}}" class="pt-text pt-t-{{item.ptBadge.tone}}">{{item.ptBadge.text}}</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="page-pad">
+    <!-- 合规公示（PAY-05）：细则第九条要求显著位置 -->
+    <view class="disclosure" bind:tap="onDisclosureTap" hover-class="tile-hover">
+      <text class="disclosure-text">备案信息 · 收费标准 · 退费办法 · 投诉电话</text>
+      <view class="chevron"></view>
+    </view>
+  </view>
+
+  <!-- 底部占位：tabBar 是 fixed 的，不占文档流。
+       Skyline 下 scroll-view 的 padding-bottom 不总是作用于滚动内容，
+       用显式占位比依赖容器 padding 可靠 —— 否则公示入口会被 tabBar 压住。 -->
+  <view class="tabbar-spacer"></view>
+</scroll-view>

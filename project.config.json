@@ -1,0 +1,53 @@
+{
+  "description": "岩馆经营小程序 · 会员端（appid 为占位值，真实值见 project.private.config.json）",
+  "appid": "wx0000000000000000",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "minified": true,
+    "postcss": true,
+    "skylineRenderEnable": false,
+    "useCompilerPlugins": [
+      "typescript"
+    ],
+    "ignoreDevUnusedFiles": true,
+    "ignoreUploadUnusedFiles": true,
+    "compileWorklet": false,
+    "uglifyFileName": false,
+    "uploadWithSourceMap": true,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "condition": false,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
+  },
+  "compileType": "miniprogram",
+  "libVersion": "3.4.0",
+  "projectname": "rockgym-miniprogram",
+  "miniprogramRoot": "./",
+  "simulatorPluginLibVersion": {},
+  "packOptions": {
+    "ignore": [
+      { "type": "glob", "value": "**/.DS_Store" },
+      { "type": "folder", "value": ".git" },
+      { "type": "folder", "value": "node_modules" },
+      { "type": "file", "value": "package.json" },
+      { "type": "file", "value": "package-lock.json" },
+      { "type": "file", "value": "tsconfig.json" },
+      { "type": "file", "value": "project.private.config.json" },
+      { "type": "file", "value": "design/tokens.ts" },
+      { "type": "file", "value": "services/config.private.example.ts" },
+      { "type": "file", "value": "scripts/pre-publish-check.sh" }
+    ],
+    "include": []
+  },
+  "editorSetting": {}
+}

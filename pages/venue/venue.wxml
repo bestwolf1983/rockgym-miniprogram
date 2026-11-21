@@ -1,0 +1,36 @@
+<!--
+  场馆。门店清单是静态展示数据（见 venue.ts 顶部注释）。
+  当前门店置顶并打标 —— 多店品牌下"我在哪家"比"有几家店"更需要一眼看到。
+-->
+<scroll-view scroll-y class="page">
+  <view class="page-pad">
+    <text class="pt">场馆</text>
+    <text class="pt-sub">共 {{venues.length}} 家门店 · 当前已开通三里屯店</text>
+
+    <view
+      wx:for="{{venues}}"
+      wx:key="id"
+      class="vn {{item.status === 'SOON' ? 'is-soon' : ''}}"
+      data-id="{{item.id}}"
+      data-status="{{item.status}}"
+      bind:tap="onVenueTap"
+      hover-class="tile-hover"
+    >
+      <view class="vn-photo">
+        <image class="vn-img" src="{{item.img}}" mode="aspectFill" lazy-load />
+        <view wx:if="{{item.status === 'CURRENT'}}" class="vn-badge">当前门店</view>
+      </view>
+
+      <view class="vn-body">
+        <text class="vn-name">{{item.name}}</text>
+        <text class="vn-addr">{{item.addr}}</text>
+        <view class="vn-foot">
+          <text class="chip">{{item.city}}</text>
+          <text class="chip {{item.status === 'CURRENT' ? 'chip-on' : ''}}">{{item.statusLabel}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="tabbar-spacer"></view>
+</scroll-view>

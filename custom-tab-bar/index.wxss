@@ -1,0 +1,94 @@
+/* 自定义 tabBar。
+   选中项凸起：图标托座上浮成实心气泡，文字留在原位。
+   用 transform 上浮而非改 margin —— transform 不触发重排，
+   且不影响文字位置，切换时只有气泡在动，视觉上更稳。
+
+   ⚠️ 所有 var() 都带字面量兜底。设计变量定义在 `page, .rg-scope` 上，
+   而 custom-tab-bar 不在 page 元素内，靠 WXML 根节点的 rg-scope 类引入。
+   兜底值保证万一作用域再出问题，也只是丢失主题化，不会整块不可见
+   —— 曾出现过气泡背景失效、白色图标融进白底的问题。 */
+.tabbar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: calc(112rpx + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  background: rgba(255, 255, 255, .94);
+  backdrop-filter: blur(20px);
+  border-top: 1rpx solid var(--c-line, #E8EFED);
+  display: flex;
+  align-items: flex-start;
+  padding-top: 14rpx;
+  z-index: 100;
+}
+
+.tabbar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+/* 凸起气泡会超出 tabBar 顶边，选中项需盖在相邻项之上 */
+.tabbar-item.is-active { z-index: 1; }
+
+/* --- 图标托座 ---
+   未选中：透明底，图标平铺；
+   选中：上浮 + 实心渐变圆 + 白色描边图标。
+   托座尺寸固定，靠 transform 上浮，避免尺寸变化引起兄弟节点抖动。 */
+.tabbar-dock {
+  width: 72rpx; height: 72rpx;
+  border-radius: var(--r-full, 999rpx);
+  display: flex; align-items: center; justify-content: center;
+  background: transparent;
+  transition:
+    transform var(--m-fast, 160ms) var(--m-ease, cubic-bezier(.2,.8,.2,1)),
+    background var(--m-fast, 160ms) var(--m-ease, cubic-bezier(.2,.8,.2,1)),
+    box-shadow var(--m-fast, 160ms) var(--m-ease, cubic-bezier(.2,.8,.2,1));
+}
+.is-active .tabbar-dock {
+  transform: translateY(-30rpx);
+  background: linear-gradient(
+    160deg,
+    var(--c-primary, #2FC4A7) 0%,
+    var(--c-primary-strong, #1FA98F) 100%
+  );
+  box-shadow: var(--sh-rise, 0 8rpx 32rpx rgba(47, 196, 167, .18));
+  /* 白边把气泡从 tabBar 背景里"抠"出来，凸起感来自这一圈 */
+  border: 6rpx solid var(--c-surface, #FFFFFF);
+}
+
+.tabbar-icon {
+  width: 40rpx; height: 40rpx;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 40rpx 40rpx;
+}
+
+/* 文字：选中态变色加粗。位置不随气泡上浮而动 */
+.tabbar-text {
+  font-size: 20rpx;
+  color: var(--c-text-3, #93A29F);
+  /* 托座 72rpx 已占位，这里用负值把文字收回气泡下方 */
+  margin-top: -8rpx;
+  transition: color var(--m-fast, 160ms) var(--m-ease, cubic-bezier(.2,.8,.2,1));
+}
+.is-active .tabbar-text { color: var(--c-primary-strong, #1FA98F); font-weight: 600; }
+
+/* --- 图标（data URI SVG，由 24x24 线性图形生成）---
+   未选中为 --c-text-3(#93A29F) 描边；选中在实心气泡内改白色描边。
+   stroke 颜色必须写死在 data URI 里 —— WXSS 的 background-image
+   拿不到 currentColor，所以每个图标存两份。
+
+   序号与 app.json 的 tabBar.list 一致：0 首页 / 1 场馆 / 2 购卡 / 3 我的。
+   加 tab 时在这里补一组（未选中 + 选中各一份），序号必须对齐，
+   否则会出现"图标和文字对不上"的错位。 */
+
+.tabbar-icon-0 { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2393A29F%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%2010.5L12%203l9%207.5%22%2F%3E%3Cpath%20d%3D%22M5.5%209.5V20h13V9.5%22%2F%3E%3C%2Fsvg%3E"); }
+.tabbar-icon-1 { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2393A29F%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4.5%2020.5V8.2L12%204l7.5%204.2v12.3%22%2F%3E%3Cpath%20d%3D%22M2.5%2020.5h19%22%2F%3E%3Cpath%20d%3D%22M9.5%2020.5v-6h5v6%22%2F%3E%3C%2Fsvg%3E"); }
+.tabbar-icon-2 { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2393A29F%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%223%22%20y%3D%225.5%22%20width%3D%2218%22%20height%3D%2213%22%20rx%3D%222.5%22%2F%3E%3Cpath%20d%3D%22M3%2010.5h18%22%2F%3E%3Cpath%20d%3D%22M6.5%2014.5h4%22%2F%3E%3C%2Fsvg%3E"); }
+.tabbar-icon-3 { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2393A29F%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%228%22%20r%3D%223.8%22%2F%3E%3Cpath%20d%3D%22M4.5%2020.5c0-3.8%203.4-6.2%207.5-6.2s7.5%202.4%207.5%206.2%22%2F%3E%3C%2Fsvg%3E"); }
+
+.is-active .tabbar-icon-0 { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%2010.5L12%203l9%207.5%22%2F%3E%3Cpath%20d%3D%22M5.5%209.5V20h13V9.5%22%2F%3E%3C%2Fsvg%3E"); }
+.is-active .tabbar-icon-1 { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4.5%2020.5V8.2L12%204l7.5%204.2v12.3%22%2F%3E%3Cpath%20d%3D%22M2.5%2020.5h19%22%2F%3E%3Cpath%20d%3D%22M9.5%2020.5v-6h5v6%22%2F%3E%3C%2Fsvg%3E"); }
+.is-active .tabbar-icon-2 { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%223%22%20y%3D%225.5%22%20width%3D%2218%22%20height%3D%2213%22%20rx%3D%222.5%22%2F%3E%3Cpath%20d%3D%22M3%2010.5h18%22%2F%3E%3Cpath%20d%3D%22M6.5%2014.5h4%22%2F%3E%3C%2Fsvg%3E"); }
+.is-active .tabbar-icon-3 { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23FFFFFF%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%228%22%20r%3D%223.8%22%2F%3E%3Cpath%20d%3D%22M4.5%2020.5c0-3.8%203.4-6.2%207.5-6.2s7.5%202.4%207.5%206.2%22%2F%3E%3C%2Fsvg%3E"); }

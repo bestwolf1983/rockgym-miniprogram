@@ -1,0 +1,9 @@
+{
+  "name": "rockgym-miniprogram",
+  "version": "1.0.0",
+  "description": "岩馆小程序 · 岩友端",
+  "devDependencies": {
+    "miniprogram-api-typings": "^5.2.3",
+    "typescript": "^5.9.3"
+  }
+}

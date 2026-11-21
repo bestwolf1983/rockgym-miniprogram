@@ -1,0 +1,26 @@
+# 依赖与构建产物
+node_modules/
+miniprogram_npm/
+dist/
+build/
+
+# 微信开发者工具：个人配置与本地缓存（官方建议不纳入版本管理）
+project.private.config.json
+
+# 运行时私有配置（真实云环境 ID 与客户端 Key）
+config.private.ts
+.idea/
+.vscode/
+.DS_Store
+
+# 环境变量与密钥：只提交 .env.example 占位模板
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+
+# 日志与临时文件
+*.log
+npm-debug.log*

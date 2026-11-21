@@ -1,0 +1,78 @@
+<!-- 今日课表时间轴。已结束的课次淡化但不隐藏，让人看到"今天已经上了什么" -->
+<view class="tl">
+  <block wx:for="{{entries}}" wx:key="id" wx:for-index="idx">
+
+    <!-- 自由攀爬时段已从课表撤下（2026-09-25，老板确认）。
+         这里用 block + wx:if 跳过整项，而不是在入口把数组过滤掉：
+         nowAfterIndex 是服务端按原始 entries 算的下标，过滤数组会让它错位，
+         当前时刻指示线就会插到不该插的位置。 -->
+    <block wx:if="{{item.kind !== 'FREE_CLIMB'}}">
+      <view
+        class="tl-item tone-{{item.tone}} state-{{item.state}} {{item.mine ? 'is-mine' : ''}}"
+      >
+        <view class="tl-time">
+          <text class="tl-hh">{{item.timeLabel}}</text>
+          <text class="tl-dur">{{item.durationLabel}}</text>
+        </view>
+        <view class="tl-node"></view>
+
+        <!-- 课程卡 -->
+        <view
+          class="tl-card"
+          data-id="{{item.id}}"
+          data-kind="{{item.kind}}"
+          bind:tap="onEntryTap"
+          hover-class="tl-card-hover"
+        >
+          <view class="tl-head">
+            <text class="grade-tag tone-{{item.tone}}">{{item.gradeLabel}}</text>
+            <text wx:if="{{item.state === 'live'}}" class="tl-live">进行中</text>
+          </view>
+
+          <text class="tl-title">{{item.title}}</text>
+
+          <!-- ★ 具体教学动作：种草的核心一行 -->
+          <view class="tl-points">
+            <text wx:for="{{item.highlights}}" wx:for-item="pt" wx:key="*this" class="point">{{pt}}</text>
+          </view>
+
+          <view wx:if="{{item.coach}}" class="tl-coach" catch:tap="onCoachTap" data-coach-id="{{item.coach.id}}">
+            <image class="coach-avatar" src="{{item.coach.avatarUrl}}" mode="aspectFill" lazy-load />
+            <view class="coach-meta">
+              <view class="coach-name">
+                <text>{{item.coach.nickname}}</text>
+                <text wx:if="{{item.coach.featured}}" class="coach-badge">主推</text>
+              </view>
+              <text class="coach-tag">{{item.coach.tagline}}</text>
+            </view>
+            <!-- 无名额信息时（如已结束），按钮跟在教练行右侧 -->
+            <text
+              wx:if="{{!item.seat}}"
+              class="tl-cta cta-{{item.cta.variant}}"
+            >{{item.cta.text}}</text>
+          </view>
+
+          <view wx:if="{{item.seat}}" class="tl-foot">
+            <view class="seat level-{{item.seat.level}}">
+              <view class="seat-bar">
+                <view class="seat-bar-fill level-{{item.seat.level}}" style="width:{{item.seat.percent}}%"></view>
+              </view>
+              <text>{{item.seat.label}}</text>
+            </view>
+            <text
+              class="tl-cta cta-{{item.cta.variant}}"
+              data-path="{{item.cta.path}}"
+              data-disabled="{{item.cta.disabled}}"
+              catch:tap="onCtaTap"
+            >{{item.cta.text}}</text>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <!-- 当前时刻指示线 -->
+    <view wx:if="{{idx === nowAfterIndex}}" class="tl-now">
+      <text class="tl-now-label">{{nowLabel}}</text>
+    </view>
+  </block>
+</view>

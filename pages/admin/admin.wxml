@@ -1,0 +1,163 @@
+<!--
+  B 端 · 人员与角色。
+ 「我能做什么」直接渲染服务端下发的 abilities —— 端上不判断角色能干什么。
+-->
+<!-- scroll-with-animation + scroll-top：点标题可回顶（本页内容长，
+     滑到底部后一路往回滑很费劲）。scroll-top 变化才会触发滚动，
+     故 onBackTopTap 里用"先置 1 再置 0"的写法。 -->
+<scroll-view
+  scroll-y
+  class="page"
+  scroll-top="{{scrollTop}}"
+  scroll-with-animation
+  refresher-enabled
+  bind:refresherrefresh="onPullDownRefresh"
+>
+  <view class="page-pad">
+    <!-- 全局是自定义导航（app.json: navigationStyle=custom），没有系统返回键；
+         B 端又是非 tab 页，不自带返回入口的话真机进去就出不来 -->
+    <view class="nav">
+      <text class="back" bind:tap="onBackTap">‹ 返回</text>
+    </view>
+    <text class="pt" bind:tap="onBackTopTap">员工 · B 端</text>
+    <text class="pt-sub">角色与授权 · 判定在服务端</text>
+
+    <view wx:if="{{loading}}" class="hint">加载中…</view>
+    <view wx:elif="{{error}}" class="err">{{error}}</view>
+
+    <block wx:else>
+      <!-- 演示身份切换。真实环境由登录态决定，上线前整块删除 -->
+      <view class="demo">
+        <text class="demo-label">演示身份</text>
+        <view class="demo-chips">
+          <text
+            wx:for="{{demoStaffs}}"
+            wx:key="openid"
+            class="demo-chip {{openid === item.openid ? 'is-on' : ''}}"
+            data-openid="{{item.openid}}"
+            bind:tap="onStaffTap"
+          >{{item.label}}</text>
+        </view>
+      </view>
+
+      <!-- 通道自检：真机没有控制台，点一下就知道云函数链路通不通 -->
+      <view class="ping" bind:tap="onPingTap">
+        <text class="ping-b">通道自检</text>
+        <text class="ping-r">{{pingText || '点击检测云函数是否可达'}}</text>
+      </view>
+
+      <view class="me-card">
+        <text class="mc-name">{{me.staff.displayName || '未绑定员工'}}</text>
+        <view class="mc-roles">
+          <text wx:for="{{me.roles}}" wx:key="role" class="role-chip">{{item.label}}<text wx:if="{{item.storeName}}"> · {{item.storeName}}</text></text>
+          <text wx:if="{{!me.roles.length}}" class="mc-none">尚无角色 · 等待管理员授权</text>
+        </view>
+      </view>
+
+      <view class="section-title">
+        <text class="section-h">我能做什么</text>
+      </view>
+      <view class="abilities">
+        <text wx:for="{{me.abilities}}" wx:key="*this" class="ab">{{item}}</text>
+        <text wx:if="{{!me.abilities.length}}" class="mc-none">无 —— 没有任何功能入口</text>
+      </view>
+
+      <!-- 经营报表：管理员/店长看全店；教练只看自己的收入（库函数按身份收敛）。
+           月份切换只影响按月报表（收入/售卡），签到趋势固定近 30 天。 -->
+      <block wx:if="{{incomeRows.length || checkin || salesRows.length}}">
+        <view class="section-title">
+          <text class="section-h">经营报表</text>
+          <view class="rp-months">
+            <text
+              wx:for="{{reportMonths}}"
+              wx:key="*this"
+              class="rp-month {{reportMonth === item ? 'is-on' : ''}}"
+              data-month="{{item}}"
+              bind:tap="onReportMonthTap"
+            >{{item.slice(5)}}月</text>
+          </view>
+        </view>
+
+        <view class="rp-card">
+          <view class="rp-head">
+            <text class="rp-t">教练收入 · {{reportMonth}}</text>
+            <text class="rp-sub">{{incomeSummary}}</text>
+          </view>
+          <view wx:for="{{incomeRows}}" wx:key="coachId" class="rp-row">
+            <text class="rp-name">{{item.coachName}}</text>
+            <text class="rp-meta">{{item.sessions}} 节 · 实收 {{item.revenueLabel}} · {{item.rateLabel}}</text>
+            <text class="rp-val">{{item.amountLabel}}</text>
+          </view>
+          <view wx:if="{{!incomeRows.length}}" class="mc-none">本月暂无结算记录</view>
+        </view>
+
+        <view wx:if="{{checkin}}" class="rp-card">
+          <view class="rp-head">
+            <text class="rp-t">到店签到 · 近 30 天</text>
+            <text class="rp-sub">{{checkin.summary.total}} 人次 · 日均 {{checkin.summary.avgPerDay}}</text>
+          </view>
+          <view class="rp-slots">
+            <view wx:for="{{checkin.bySlot}}" wx:key="slot" class="rp-slot">
+              <text class="rp-slot-n">{{item.count}}</text>
+              <text class="rp-slot-l">{{item.slot}}</text>
+            </view>
+          </view>
+        </view>
+
+        <view wx:if="{{salesRows.length}}" class="rp-card">
+          <view class="rp-head">
+            <text class="rp-t">售卡 · {{reportMonth}}</text>
+            <text class="rp-sub">{{salesSummary}}</text>
+          </view>
+          <view wx:for="{{salesRows}}" wx:key="productName" class="rp-row">
+            <text class="rp-name">{{item.productName}}</text>
+            <text class="rp-meta">{{item.count}} 单</text>
+            <text class="rp-val">{{item.amountLabel}}</text>
+          </view>
+        </view>
+      </block>
+
+      <!-- 人员与授权：只有管理员会拿到这份列表（服务端按能力返回） -->
+      <block wx:if="{{staffs.length}}">
+        <view class="section-title">
+          <text class="section-h">人员与授权</text>
+        </view>
+
+        <view wx:for="{{staffs}}" wx:key="id" class="st">
+          <view class="st-head">
+            <text class="st-name">{{item.displayName}}</text>
+            <text class="st-add" data-id="{{item.id}}" bind:tap="onGrantTap">+ 授予</text>
+          </view>
+          <view class="st-roles">
+            <text
+              wx:for="{{item.roles}}"
+              wx:for-item="r"
+              wx:key="role"
+              class="role-chip is-role"
+              data-id="{{item.id}}"
+              data-role="{{r.role}}"
+              bind:tap="onRoleTap"
+            >{{r.label}}<text wx:if="{{r.storeName}}"> · {{r.storeName}}</text></text>
+            <text wx:if="{{!item.roles.length}}" class="mc-none">无角色</text>
+          </view>
+        </view>
+
+        <view class="tip">点角色可回收；每次授予／回收都会写入审计</view>
+      </block>
+
+      <!-- 审计：谁动了权限，留痕可查（ROL-04）。管理员看全量，店长看本店 -->
+      <block wx:if="{{audits.length}}">
+        <view class="section-title">
+          <text class="section-h">最近操作记录</text>
+        </view>
+        <view wx:for="{{audits}}" wx:key="id" class="au">
+          <text class="au-time">{{item.timeLabel}}</text>
+          <text class="au-text">{{item.actorName}} {{item.actionLabel}}{{item.detailText}} → {{item.targetName}}</text>
+        </view>
+      </block>
+    </block>
+  </view>
+
+  <!-- B 端是非 tab 页，不显示 tabBar，底部只留安全区即可 -->
+  <view class="page-bottom"></view>
+</scroll-view>

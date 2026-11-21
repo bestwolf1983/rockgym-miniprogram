@@ -1,0 +1,334 @@
+/* 首页样式。与 prototype/index.html 视觉一一对应，同一套 token 驱动 */
+
+.home {
+  height: 100vh;
+  background: var(--c-bg);
+}
+
+/* --- 加载失败提示（真机排查用，正式版删除） ---
+   故意做得显眼：真机上数据全空时，第一眼要能看出是"请求失败"而不是"本来就没数据" */
+.load-err {
+  background: var(--c-block-soft);
+  border-radius: var(--r-lg);
+  padding: 22rpx 26rpx;
+  margin-bottom: var(--s-3);
+}
+.le-t { display: block; font-size: var(--f-sub); font-weight: 600; color: var(--c-block-ink); }
+.le-m { display: block; font-size: var(--f-cap); color: var(--c-block-ink); margin-top: 8rpx; word-break: break-all; }
+.le-h { display: block; font-size: 20rpx; color: var(--c-text-2); margin-top: 10rpx; word-break: break-all; }
+
+/* --- 顶部 --- */
+.home-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: calc(var(--s-3) + env(safe-area-inset-top));
+  padding-bottom: var(--s-4);
+}
+.store-switch { display: flex; align-items: center; }
+.store-name { font-size: var(--f-body); font-weight: 600; }
+.caret {
+  width: 14rpx; height: 14rpx; margin-left: 10rpx;
+  border-right: 3rpx solid var(--c-text-2);
+  border-bottom: 3rpx solid var(--c-text-2);
+  transform: rotate(45deg) translateY(-3rpx);
+}
+.bell { width: 40rpx; height: 40rpx; position: relative; }
+.bell-dot {
+  position: absolute; top: 0; right: 0;
+  width: 12rpx; height: 12rpx; border-radius: var(--r-full);
+  background: var(--c-block);
+}
+
+.greeting { display: block; font-size: var(--f-h1); font-weight: 600; letter-spacing: -0.6rpx; }
+.greeting-sub {
+  display: block; font-size: var(--f-sub); color: var(--c-text-2);
+  margin: 10rpx 0 var(--s-4);
+}
+
+/* --- 演示身份切换 ---
+   仅演示用，正式上线前连同 WXML 里的 demo-switch 一起删除。
+   刻意做成虚线框 + 弱化配色，让人一眼看出这不是正式功能。 */
+.demo-switch {
+  border: 1rpx dashed var(--c-line);
+  border-radius: var(--r-md);
+  padding: 16rpx var(--s-3);
+  margin-bottom: var(--s-4);
+  background: var(--c-surface);
+}
+.demo-label {
+  display: block;
+  font-size: 18rpx; color: var(--c-text-3);
+  margin-bottom: 12rpx;
+}
+.demo-chips { display: flex; }
+.demo-chip {
+  flex: 1;
+  text-align: center;
+  font-size: 20rpx;
+  padding: 10rpx 0;
+  margin-right: 8rpx;
+  border-radius: var(--r-full);
+  background: var(--c-surface-sunken);
+  color: var(--c-text-2);
+}
+.demo-chip:last-child { margin-right: 0; }
+.demo-chip.is-on {
+  background: var(--c-primary);
+  color: var(--c-text-inverse);
+  font-weight: 600;
+}
+
+/* --- 两个并列主入口 --- */
+.entry-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-3);
+  margin-top: var(--s-3);
+}
+.entry-tile {
+  background: var(--c-surface);
+  border-radius: var(--r-lg);
+  padding: var(--s-4);
+  box-shadow: var(--sh-card);
+}
+.tile-hover { transform: scale(.97); transition: transform var(--m-fast) var(--m-ease); }
+.entry-icon { width: 68rpx; height: 68rpx; border-radius: var(--r-md); margin-bottom: 18rpx; }
+.entry-icon-a { background: var(--c-primary-soft); }
+.entry-icon-b { background: var(--c-accent-soft); }
+.entry-name { display: block; font-size: var(--f-body); font-weight: 600; }
+.entry-sub { display: block; font-size: var(--f-cap); color: var(--c-text-3); margin-top: 6rpx; }
+
+/* --- 区块标题：同屏最多两级标题 --- */
+.section-title {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin: var(--s-5) 0 var(--s-3);
+}
+.section-h { font-size: var(--f-h2); font-weight: 600; letter-spacing: -0.4rpx; }
+.section-more { font-size: var(--f-cap); color: var(--c-text-3); }
+
+/* --- 我的今日预约（有预约时置顶） --- */
+.my-booking {
+  background: linear-gradient(135deg, var(--c-primary) 0%, var(--c-primary-strong) 100%);
+  border-radius: var(--r-lg);
+  padding: var(--s-4);
+  color: var(--c-text-inverse);
+  box-shadow: var(--sh-rise);
+}
+.mb-k { display: block; font-size: 20rpx; opacity: .85; letter-spacing: 1rpx; }
+.mb-t { display: block; font-size: var(--f-h2); font-weight: 700; margin-top: 8rpx; }
+.mb-s { display: block; font-size: 22rpx; opacity: .9; margin-top: 10rpx; }
+.mb-coach { display: flex; align-items: center; margin-top: 24rpx; }
+.mb-avatar {
+  width: 56rpx; height: 56rpx; border-radius: var(--r-full);
+  border: 3rpx solid rgba(255, 255, 255, .5); margin-right: 16rpx;
+}
+.mb-cn { display: block; font-size: 22rpx; font-weight: 600; }
+.mb-ct { display: block; font-size: 18rpx; opacity: .85; margin-top: 2rpx; }
+.mb-actions { display: flex; margin-top: 26rpx; }
+.mb-btn {
+  flex: 1; text-align: center;
+  font-size: 22rpx; font-weight: 600;
+  padding: 16rpx 0; border-radius: var(--r-full);
+  background: rgba(255, 255, 255, .2); color: var(--c-text-inverse);
+  margin-right: 14rpx;
+}
+.mb-btn:last-child { margin-right: 0; }
+.mb-btn.solid { background: var(--c-surface); color: var(--c-primary-strong); }
+
+/* --- 课表日期与难度筛选 --- */
+.day-switch, .grade-filter, .coach-strip { width: 100%; }
+.day-switch-inner { display: flex; padding-bottom: 8rpx; }
+.day {
+  flex: none; min-width: 92rpx; text-align: center;
+  padding: 14rpx 12rpx; border-radius: var(--r-md);
+  background: var(--c-surface); box-shadow: var(--sh-card);
+  margin-right: 10rpx;
+}
+.day-w { display: block; font-size: 20rpx; color: var(--c-text-3); }
+.day-d { display: block; font-size: var(--f-sub); font-weight: 600; margin-top: 4rpx; }
+.day-n { display: block; font-size: 18rpx; color: var(--c-primary-strong); margin-top: 4rpx; }
+.day.is-on { background: var(--c-primary); box-shadow: var(--sh-rise); }
+.day.is-on .day-w, .day.is-on .day-d, .day.is-on .day-n { color: var(--c-text-inverse); }
+
+.grade-filter-inner { display: flex; padding: 22rpx 0 8rpx; }
+.gf {
+  flex: none; font-size: 22rpx;
+  padding: 12rpx 26rpx; border-radius: var(--r-full);
+  background: var(--c-surface); color: var(--c-text-2);
+  box-shadow: var(--sh-card); margin-right: 12rpx;
+  border: 3rpx solid transparent;
+}
+.gf.is-on { border-color: var(--c-primary); color: var(--c-primary-strong); font-weight: 600; }
+
+.tl-wrap { margin-top: var(--s-4); }
+
+/* --- 教练横滑 --- */
+.coach-strip-inner { display: flex; padding: 4rpx var(--s-5) 8rpx; }
+.coach-cell {
+  flex: none; width: 156rpx; text-align: center;
+  background: var(--c-surface); border-radius: var(--r-lg);
+  padding: 22rpx 12rpx; box-shadow: var(--sh-card);
+  margin-right: 18rpx;
+}
+.cc-avatar-wrap { position: relative; width: 88rpx; margin: 0 auto 12rpx; }
+.cc-avatar { width: 88rpx; height: 88rpx; border-radius: var(--r-full); margin-bottom: 12rpx; }
+
+/* 私教角标（PT-05）：卡片右上角的直角等边三角形，斜边朝内下。
+   用 clip-path 而不是 border 三角 —— border 法是个矩形盒子，会盖住卡片圆角。 */
+.pt-corner {
+  position: absolute; top: 0; right: 0;
+  width: 60rpx; height: 60rpx;
+  clip-path: polygon(100% 0, 100% 100%, 0 0);
+}
+.pt-primary {
+  background: linear-gradient(225deg, var(--c-primary) 0%, var(--c-primary-strong) 100%);
+}
+.pt-block {
+  background: linear-gradient(225deg, #FF6B6B 0%, var(--c-block) 100%);
+}
+.pt-text { display: block; margin-top: 8rpx; font-size: 18rpx; font-weight: 600; }
+.pt-t-primary { color: var(--c-primary-strong); }
+.pt-t-block { color: var(--c-block-ink); }
+.cc-name { display: block; font-size: 22rpx; font-weight: 600; }
+.cc-spec { display: block; font-size: 18rpx; color: var(--c-text-3); margin-top: 4rpx; }
+
+/* --- 课程体系 --- */
+.course-card {
+  background: linear-gradient(120deg, var(--c-surface) 0%, var(--c-primary-soft) 100%);
+  border-radius: var(--r-lg);
+  padding: var(--s-4);
+  box-shadow: var(--sh-card);
+}
+.course-name { display: block; font-size: var(--f-body); font-weight: 600; }
+.course-sub { display: block; font-size: var(--f-cap); color: var(--c-text-3); margin-top: 6rpx; }
+.chip-on {
+  font-size: var(--f-cap); font-weight: 600;
+  padding: 8rpx 20rpx; border-radius: var(--r-full);
+  background: var(--c-primary-soft); color: var(--c-primary-strong);
+}
+.stage-dots { display: flex; margin-top: 18rpx; }
+.stage-dot {
+  flex: 1; height: 6rpx; border-radius: var(--r-full);
+  background: rgba(47, 196, 167, .2);
+  margin-right: 10rpx;
+}
+.stage-dot-done { background: var(--c-primary); }
+.stage-dot-now { background: var(--c-accent); }
+
+/* --- 公示入口 --- */
+.disclosure {
+  margin-top: var(--s-5);
+  padding: 26rpx var(--s-4);
+  background: var(--c-surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-card);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.disclosure-text { font-size: var(--f-cap); color: var(--c-text-2); }
+.chevron {
+  width: 12rpx; height: 12rpx;
+  border-right: 3rpx solid var(--c-text-3);
+  border-bottom: 3rpx solid var(--c-text-3);
+  transform: rotate(-45deg);
+}
+
+/* --- 请求域名清单（demo 用，上线前删除） ---
+   真机调试能出数据、预览出不了时，用它核对微信后台 request 合法域名是否配全 */
+.net-hosts {
+  margin-top: var(--s-2);
+  padding: 12rpx 18rpx;
+  border-radius: var(--r-sm);
+  background: var(--c-surface-sunken);
+}
+.nh-k { display: block; font-size: 18rpx; color: var(--c-text-3); }
+.nh-v { display: block; font-size: 18rpx; color: var(--c-text-2); margin-top: 4rpx; word-break: break-all; }
+
+/* --- 扫码签到 ---
+   扫的是馆内二维码（用户主动扫），不是出示自己的码。 */
+.scan-card {
+  background: var(--c-surface);
+  border-radius: var(--r-lg);
+  padding: 28rpx var(--s-4);
+  box-shadow: var(--sh-card);
+  margin-bottom: var(--s-4);
+}
+.scan-head { margin-bottom: 22rpx; }
+.scan-title {
+  display: block; font-size: 32rpx; font-weight: 600; margin-bottom: 6rpx;
+}
+.scan-sub { display: block; font-size: 24rpx; color: var(--c-text-2); }
+.scan-btn {
+  width: 100%; font-size: 30rpx; font-weight: 600;
+  padding: 22rpx 0; border-radius: var(--r-md);
+  background: var(--c-primary); color: var(--c-text-inverse);
+  box-shadow: 0 8rpx 32rpx rgba(47, 196, 167, .18);
+}
+.scan-btn::after { border: none; }
+.scan-btn-warn { background: var(--c-warn); }
+.scan-btn-block { background: var(--c-block); }
+.scan-btn-hover { opacity: .9; }
+.scan-tip {
+  display: block; margin-top: 16rpx; text-align: center;
+  font-size: 21rpx; color: var(--c-text-3);
+}
+
+/* --- 换线信息（ROUTE-01~06） --- */
+.floorplan {
+  width: 100%; border-radius: var(--r-lg);
+  box-shadow: var(--sh-card); display: block;
+}
+.floorplan-cap {
+  display: block; text-align: center;
+  font-size: 20rpx; color: var(--c-text-3); margin: 12rpx 0 var(--s-3);
+}
+
+.route-list { margin-top: 4rpx; }
+.route-card {
+  background: var(--c-surface);
+  border-radius: var(--r-lg);
+  padding: 28rpx var(--s-4);
+  box-shadow: var(--sh-card);
+  margin-bottom: 20rpx;
+}
+.rt-head { display: flex; align-items: center; gap: 12rpx; }
+.rt-area { font-size: 29rpx; font-weight: 600; }
+.rt-new {
+  font-size: 20rpx; font-weight: 600; color: var(--c-text-inverse);
+  background: var(--c-primary);
+  padding: 4rpx 14rpx; border-radius: var(--r-full);
+}
+.rt-times { display: flex; gap: 20rpx; margin-top: 10rpx; }
+.rt-fresh { font-size: 23rpx; color: var(--c-text-2); }
+.rt-cd { font-size: 23rpx; color: var(--c-text-2); }
+.rt-cd.is-urgent { color: var(--c-block-ink); font-weight: 600; }
+
+.hgroup { margin-top: 24rpx; }
+.hgroup-t { display: block; font-size: 21rpx; color: var(--c-text-3); margin-bottom: 12rpx; }
+.hbars { display: flex; align-items: flex-end; gap: 8rpx; }
+.hbar { flex: 1; text-align: center; }
+.hbar-track {
+  height: 92rpx; border-radius: 8rpx;
+  background: var(--c-surface-sunken);
+  display: flex; align-items: flex-end; overflow: hidden;
+}
+.hbar-fill {
+  width: 100%; border-radius: 8rpx 8rpx 0 0;
+  background: linear-gradient(180deg, var(--c-primary) 0%, var(--c-primary-strong) 100%);
+}
+.hbar-n { display: block; font-size: 19rpx; color: var(--c-text-2); margin-top: 6rpx; }
+.hbar-l { display: block; font-size: 19rpx; color: var(--c-text-3); }
+
+.rt-foot { margin-top: 20rpx; }
+.rt-count { font-size: 22rpx; color: var(--c-text-3); }
+.rt-setter {
+  display: flex; align-items: center; gap: 16rpx;
+  margin-top: 20rpx; padding-top: 20rpx;
+  border-top: 1rpx solid var(--c-line);
+}
+.rt-s-avatar {
+  width: 60rpx; height: 60rpx; border-radius: var(--r-full); flex: none;
+}
+.rt-s-meta { min-width: 0; }
+.rt-sn { display: block; font-size: 25rpx; font-weight: 600; }
+.rt-st { display: block; font-size: 21rpx; color: var(--c-text-3); margin-top: 2rpx; }

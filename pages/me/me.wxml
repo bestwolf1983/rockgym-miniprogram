@@ -1,0 +1,82 @@
+<!-- 我的：通行证 + 我的卡 -->
+<scroll-view scroll-y class="page" refresher-enabled bind:refresherrefresh="onPullDownRefresh">
+  <view class="page-pad">
+    <text class="pt">我的</text>
+
+    <!-- 用户 -->
+    <view class="me">
+      <view class="me-av">{{initial}}</view>
+      <view class="me-info">
+        <text class="me-name">{{isVisitor ? '游客' : member.displayName}}</text>
+        <text class="me-sub">{{meSub}}</text>
+      </view>
+    </view>
+
+    <!-- 游客：登录引导。通行证与我的卡都是私人数据，游客态不渲染 -->
+    <block wx:if="{{isVisitor}}">
+      <button class="login-btn" hover-class="tile-hover" bind:tap="onLoginTap">微信一键登录</button>
+      <text class="login-tip">游客可浏览课表与购卡；签到、约课、我的卡需登录</text>
+    </block>
+
+    <block wx:else>
+    <!-- 通行证 -->
+    <view class="section-title">
+      <text class="section-h">通行证</text>
+      <text class="section-more">{{admission.title}}</text>
+    </view>
+    <admission-card admission="{{admission}}" loading="{{loading}}" bind:tap="onPassAction" />
+
+    <!-- 我的卡 -->
+    <block wx:if="{{myCards.length}}">
+      <view class="section-title">
+        <text class="section-h">我的卡</text>
+      </view>
+
+      <block wx:for="{{myCards}}" wx:key="id">
+        <view class="wallet {{item.bindHolder ? 'month' : ''}} {{item.status === 'PENDING_ACTIVATION' ? 'pending' : ''}}">
+          <text class="w-name">{{item.name}}<text wx:if="{{item.bindHolder}}"> · 记名</text><text wx:if="{{item.source === 'SHARED'}}"> · 好友分享</text></text>
+
+          <text wx:if="{{item.status === 'PENDING_ACTIVATION'}}" class="w-big">{{item.timesTotal}} 次待激活</text>
+          <text wx:elif="{{item.timesLeft !== null}}" class="w-big">剩 {{item.timesLeft}} 次</text>
+          <text wx:else class="w-big">剩 {{item.daysLeft}} 天</text>
+
+          <text wx:if="{{item.status === 'PENDING_ACTIVATION'}}" class="w-meta">完成下方事项后自动激活</text>
+          <text wx:elif="{{item.transferable}}" class="w-meta">预收余额 ¥{{item.deferredBalance}} · 每日可转 {{item.dailyTransferLimit}} 次</text>
+          <text wx:else class="w-meta">预收余额 ¥{{item.deferredBalance}} · 人卡绑定，不可转让</text>
+        </view>
+
+        <!-- 待激活：好友分享的卡须完成安全条款与考核 -->
+        <view wx:if="{{item.activation}}" class="todo">
+          <text class="todo-h">{{item.activation.title}} · 使用前需完成</text>
+          <view wx:for="{{item.activation.missing}}" wx:for-item="m" wx:key="key" class="todo-item">
+            <text class="todo-k">{{m.sort}}</text>
+            <view class="todo-m">
+              <text class="todo-t">{{m.label}}</text>
+              <text class="todo-s">{{m.detail}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 退费试算（REF-01：按单次票原价倒扣，不是按均价） -->
+        <view wx:if="{{item.timesUsed > 0}}" class="calc">
+          <text class="calc-h">退费试算（按单次票原价倒扣）</text>
+          <view class="calc-r"><text>卡售价</text><text>¥{{item.refundQuote.paid}}</text></view>
+          <view class="calc-r minus">
+            <text>已用 {{item.refundQuote.usedTimes}} 次 × ¥{{item.refundQuote.unitPrice}}</text>
+            <text>− ¥{{item.refundQuote.deduct}}</text>
+          </view>
+          <view class="calc-r total"><text>可退</text><text>¥{{item.refundQuote.refundable}}</text></view>
+        </view>
+      </block>
+    </block>
+    </block>
+
+    <!-- B 端入口（员工）。放页尾一行小字：不占 C 端视觉，也不会让会员误点 -->
+    <view class="staff-entry" bind:tap="onStaffEntryTap" hover-class="tile-hover">
+      <text class="se-t">员工入口 · B 端</text>
+      <text class="se-s">角色与授权 ›</text>
+    </view>
+  </view>
+
+  <view class="tabbar-spacer"></view>
+</scroll-view>

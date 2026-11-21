@@ -1,0 +1,8 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "admission-card": "/components/biz/admission-card/index",
+    "course-timeline": "/components/biz/course-timeline/index"
+  },
+  "disableScroll": true
+}

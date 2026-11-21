@@ -1,0 +1,53 @@
+<!-- 教练详情（PQ-1）：私教角标的落地页 -->
+<view class="coach-page">
+  <view wx:if="{{loading}}" class="cs-loading">加载中…</view>
+
+  <block wx:elif="{{coach}}">
+    <view class="cs-head">
+      <image class="cs-avatar" src="{{coach.avatarUrl}}" mode="aspectFill" />
+      <view class="cs-id">
+        <view class="cs-name-row">
+          <text class="cs-name">{{coach.nickname}}</text>
+          <text wx:if="{{coach.ptBadge.show}}" class="cs-badge pt-t-{{coach.ptBadge.tone}}">{{coach.ptBadge.text}}</text>
+        </view>
+        <text class="cs-tag">{{coach.tagline}}</text>
+      </view>
+    </view>
+
+    <view class="cs-stats">
+      <view class="cs-stat">
+        <text class="cs-stat-n">{{coach.yearsOfExp}}</text>
+        <text class="cs-stat-l">年教龄</text>
+      </view>
+      <view class="cs-stat">
+        <text class="cs-stat-n">{{coach.scopeLabels.length}}</text>
+        <text class="cs-stat-l">可带教项目</text>
+      </view>
+    </view>
+
+    <view wx:if="{{coach.specialtyLabels.length}}" class="cs-sec">
+      <text class="cs-sec-t">擅长方向</text>
+      <view class="cs-chips">
+        <text wx:for="{{coach.specialtyLabels}}" wx:key="*this" class="cs-chip">{{item}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{coach.scopeLabels.length}}" class="cs-sec">
+      <text class="cs-sec-t">可带教项目</text>
+      <view class="cs-chips">
+        <text wx:for="{{coach.scopeLabels}}" wx:key="*this" class="cs-chip is-pass">{{item}}</text>
+      </view>
+    </view>
+
+    <!-- 排班表（PT-03）未做，给出可执行的替代路径，而不是"开发中" -->
+    <view class="cs-note">
+      私教时段预约功能开发中。当前可致电前台
+      <text class="cs-tel">{{hotline}}</text>
+      指定该教练排课。
+    </view>
+
+    <button class="cs-btn" bind:tap="onCallTap">联系前台预约</button>
+  </block>
+
+  <view wx:else class="cs-empty">未找到该教练</view>
+</view>

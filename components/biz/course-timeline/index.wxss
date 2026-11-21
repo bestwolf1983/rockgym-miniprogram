@@ -1,0 +1,161 @@
+/* 今日课表时间轴。与 prototype/timeline.css 视觉一致，同一套 token 驱动 */
+
+.tl { position: relative; padding-left: 108rpx; }
+
+/* 贯穿的时间轴竖线 */
+.tl::before {
+  content: '';
+  position: absolute;
+  left: 86rpx; top: 12rpx; bottom: 24rpx;
+  width: 3rpx;
+  background: var(--c-line);
+}
+
+.tl-item { position: relative; margin-bottom: var(--s-3); }
+
+/* 左侧时间列 */
+.tl-time {
+  position: absolute;
+  left: -108rpx; top: 28rpx;
+  width: 76rpx;
+  display: flex; flex-direction: column; align-items: flex-end;
+}
+.tl-hh { font-size: var(--f-cap); font-weight: 600; color: var(--c-text-2); }
+.tl-dur { font-size: 18rpx; color: var(--c-text-3); margin-top: 4rpx; }
+
+/* 轴上节点 */
+.tl-node {
+  position: absolute;
+  left: -30rpx; top: 34rpx;
+  width: 18rpx; height: 18rpx; border-radius: var(--r-full);
+  background: var(--c-surface);
+  border: 4rpx solid var(--c-line);
+  z-index: 2;
+}
+.tl-item.tone-beginner .tl-node { border-color: var(--c-primary); }
+.tl-item.tone-intermediate .tl-node { border-color: var(--c-accent); }
+.tl-item.tone-advanced .tl-node { border-color: var(--c-block); }
+.tl-item.state-live .tl-node {
+  background: var(--c-primary); border-color: var(--c-primary);
+  box-shadow: 0 0 0 8rpx rgba(47, 196, 167, .18);
+}
+.tl-item.state-past .tl-node { background: var(--c-line); border-color: var(--c-line); }
+
+/* 当前时刻指示线 */
+.tl-now { position: relative; height: 0; margin: var(--s-2) 0 var(--s-3); }
+.tl-now::before {
+  content: '';
+  position: absolute; left: -30rpx; right: 0; top: 0;
+  height: 3rpx; background: var(--c-block); opacity: .5;
+}
+.tl-now-label {
+  position: absolute; left: -108rpx; top: -14rpx;
+  font-size: 18rpx; font-weight: 600; color: var(--c-block);
+  background: var(--c-bg); padding-right: 8rpx;
+}
+
+/* --- 课程卡 --- */
+.tl-card {
+  background: var(--c-surface);
+  border-radius: var(--r-lg);
+  padding: 26rpx var(--s-4) var(--s-4);
+  box-shadow: var(--sh-card);
+  border-left: 6rpx solid transparent;
+}
+.tl-card-hover { transform: scale(.985); transition: transform var(--m-fast) var(--m-ease); }
+.tl-item.tone-beginner .tl-card { border-left-color: var(--c-primary); }
+.tl-item.tone-intermediate .tl-card { border-left-color: var(--c-accent); }
+.tl-item.tone-advanced .tl-card { border-left-color: var(--c-block); }
+
+/* 已结束淡化但不隐藏 */
+.tl-item.state-past .tl-card {
+  opacity: .5; box-shadow: none; background: var(--c-surface-sunken);
+}
+/* 我已约的课高亮 */
+.tl-item.is-mine .tl-card {
+  background: linear-gradient(120deg, var(--c-surface) 62%, var(--c-primary-soft) 100%);
+  box-shadow: var(--sh-rise);
+}
+.tl-item.state-live .tl-card { box-shadow: var(--sh-float); }
+
+.tl-head { display: flex; align-items: center; justify-content: space-between; }
+.tl-live {
+  font-size: 18rpx; font-weight: 600;
+  padding: 4rpx 14rpx; border-radius: var(--r-full);
+  background: var(--c-warn-soft); color: var(--c-warn-ink);
+}
+
+/* 难度标签：起步/进阶/高阶三色，散客靠颜色快速自我归类 */
+.grade-tag {
+  font-size: 20rpx; font-weight: 700; letter-spacing: .6rpx;
+  padding: 8rpx 18rpx; border-radius: var(--r-sm);
+}
+.grade-tag.tone-beginner { background: var(--c-primary-soft); color: var(--c-primary-strong); }
+.grade-tag.tone-intermediate { background: var(--c-accent-soft); color: var(--c-accent-ink); }
+.grade-tag.tone-advanced { background: var(--c-block-soft); color: var(--c-block-ink); }
+
+.tl-title {
+  display: block;
+  font-size: var(--f-h2); font-weight: 600;
+  letter-spacing: -0.4rpx; margin-top: 18rpx;
+}
+
+/* ★ 具体教学动作。"三脚猫/甩腿/dyno"这类词才是勾起好奇心的东西 */
+.tl-points { display: flex; flex-wrap: wrap; margin-top: 18rpx; }
+.point {
+  font-size: 22rpx;
+  padding: 8rpx 20rpx; border-radius: var(--r-full);
+  margin-right: 10rpx; margin-bottom: 10rpx;
+  background: var(--c-surface-sunken); color: var(--c-text-2);
+}
+.tl-item.tone-beginner .point { background: var(--c-primary-soft); color: var(--c-primary-strong); }
+.tl-item.tone-intermediate .point { background: var(--c-accent-soft); color: var(--c-accent-ink); }
+.tl-item.tone-advanced .point { background: var(--c-block-soft); color: var(--c-block-ink); }
+
+/* --- 教练区：复购跟人走，所以单独一行且可点进个人页 --- */
+.tl-coach {
+  display: flex; align-items: center;
+  margin-top: var(--s-3); padding-top: 22rpx;
+  border-top: 1rpx solid var(--c-line);
+}
+.coach-avatar {
+  width: 68rpx; height: 68rpx; border-radius: var(--r-full);
+  flex: none; background: var(--c-surface-sunken);
+  border: 3rpx solid var(--c-surface);
+}
+.coach-meta { flex: 1; min-width: 0; margin-left: 18rpx; }
+.coach-name { display: flex; align-items: center; font-size: var(--f-sub); font-weight: 600; }
+.coach-badge {
+  font-size: 18rpx; font-weight: 600;
+  padding: 2rpx 12rpx; border-radius: var(--r-sm); margin-left: 10rpx;
+  background: var(--c-primary-soft); color: var(--c-primary-strong);
+}
+.coach-tag { display: block; font-size: 20rpx; color: var(--c-text-3); margin-top: 4rpx; }
+
+/* --- 名额与行动 --- */
+.tl-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 22rpx;
+}
+.seat { display: flex; align-items: center; font-size: 22rpx; color: var(--c-text-2); }
+.seat.level-memberOnly { color: var(--c-accent-ink); }
+.seat-bar {
+  width: 92rpx; height: 8rpx; border-radius: var(--r-full);
+  background: var(--c-surface-sunken); overflow: hidden; margin-right: 12rpx;
+}
+.seat-bar-fill { height: 100%; border-radius: var(--r-full); background: var(--c-primary); }
+.seat-bar-fill.level-hot { background: var(--c-accent); }
+.seat-bar-fill.level-memberOnly { background: var(--c-accent); }
+.seat-bar-fill.level-full { background: var(--c-text-3); }
+
+.tl-cta {
+  font-size: 22rpx; font-weight: 600;
+  padding: 14rpx 30rpx; border-radius: var(--r-full);
+  background: var(--c-primary); color: var(--c-text-inverse);
+}
+.tl-cta.cta-ghost { background: var(--c-primary-soft); color: var(--c-primary-strong); }
+.tl-cta.cta-wait { background: var(--c-surface-sunken); color: var(--c-text-2); }
+.tl-cta.cta-mine { background: var(--c-pass-soft); color: var(--c-pass-ink); }
+.tl-cta.cta-done { background: transparent; color: var(--c-text-3); }
+
+

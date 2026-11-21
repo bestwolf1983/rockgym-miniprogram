@@ -1,0 +1,63 @@
+<!-- 通行证状态卡。状态色由 data-state 驱动，样式在 index.wxss -->
+
+<!-- 卡片头部抽成模板：Skyline 下用 share-element 包一层做共享元素转场；
+     WebView 没有 share-element（会被解析成 wx://not-found 并直接报错），
+     因此降级为普通 view —— 动效没了，功能不受影响（沿用项目既有的降级口径）。 -->
+<template name="acHead">
+  <view class="ac-head">
+    <view class="ac-dot"></view>
+    <text class="ac-title">{{admission.title}}</text>
+  </view>
+</template>
+
+<view class="ac-wrap">
+
+  <!-- 待确认消费黄条（PAY-02）：会员未确认则存管资金拨付不了，这是现金流入口 -->
+  <view
+    wx:if="{{admission && admission.pendingConfirmCount > 0}}"
+    class="ac-confirm"
+    bind:tap="onConfirmTap"
+  >
+    <text>有 {{admission.pendingConfirmCount}} 次消费待确认</text>
+    <text class="ac-confirm-cta">确认 →</text>
+  </view>
+
+  <!-- 骨架屏：首屏预算 1.5s，加载态不能是空白 -->
+  <view wx:if="{{loading}}" class="ac-card ac-skeleton">
+    <view class="sk-line sk-w40"></view>
+    <view class="sk-line sk-w70"></view>
+    <view class="sk-line sk-w55"></view>
+    <view class="sk-btn"></view>
+  </view>
+
+  <view
+    wx:elif="{{admission}}"
+    class="ac-card state-{{admission.state}}"
+    bind:tap="onCardTap"
+  >
+    <!-- ⚠️ 这里曾用 share-element（Skyline 专属组件）做共享元素转场。
+         WebView 渲染器里没有它，且**加 wx:if 也没用** —— 编译器静态解析时就会把它
+         变成 wx://not-found，整棵树渲染失败（2026-09-30 实测）。
+         因此移除，只留普通节点：转场动效没了，功能不受影响（降级口径）。
+         将来开启 Skyline 时，用 share-element 包住下面这行即可，模板已备好。 -->
+    <template is="acHead" data="{{admission}}" />
+
+    <view class="ac-quals">
+      <view
+        wx:for="{{admission.quals}}"
+        wx:key="label"
+        class="ac-chip ac-chip-{{item.kind}}"
+      >{{item.label}}</view>
+    </view>
+
+    <view class="ac-meta">
+      <text wx:for="{{admission.metaLines}}" wx:key="*this" class="ac-meta-line">{{item}}</text>
+    </view>
+
+    <button
+      class="ac-btn ac-btn-{{admission.action.tone}}"
+      hover-class="ac-btn-hover"
+      bind:tap="onActionTap"
+    >{{admission.action.text}}</button>
+  </view>
+</view>

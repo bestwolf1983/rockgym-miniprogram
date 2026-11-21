@@ -1,0 +1,36 @@
+{
+  "lazyCodeLoading": "requiredComponents",
+  "pages": [
+    "pages/index/index",
+    "pages/venue/venue",
+    "pages/mall/mall",
+    "pages/me/me",
+    "pages/coach/coach",
+    "pages/admin/admin"
+  ],
+  "tabBar": {
+    "custom": true,
+    "color": "#93A29F",
+    "selectedColor": "#1FA98F",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "首页" },
+      { "pagePath": "pages/venue/venue", "text": "场馆" },
+      { "pagePath": "pages/mall/mall", "text": "购卡" },
+      { "pagePath": "pages/me/me", "text": "我的" }
+    ]
+  },
+  "window": {
+    "navigationStyle": "custom",
+    "backgroundColorTop": "#F5FAF9",
+    "backgroundColorBottom": "#F5FAF9",
+    "backgroundTextStyle": "dark"
+  },
+  "sitemapLocation": "sitemap.json",
+  "permission": {
+    "scope.userLocation": { "desc": "用于自动选择最近的门店" }
+  },
+  "requiredPrivateInfos": ["getLocation", "chooseLocation"],
+  "__usePrivacyCheck__": true
+}
